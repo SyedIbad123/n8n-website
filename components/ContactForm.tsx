@@ -69,7 +69,13 @@ export default function ContactForm() {
         body: JSON.stringify({ ...clean, website: honeypot }),
       });
 
-      let data: { ok?: boolean; message?: string; error?: string; fieldErrors?: FieldErrors } = {};
+      let data: {
+        ok?: boolean;
+        message?: string;
+        error?: string;
+        requestId?: string;
+        fieldErrors?: FieldErrors;
+      } = {};
       try {
         data = await res.json();
       } catch {
@@ -84,7 +90,8 @@ export default function ContactForm() {
       } else {
         if (data.fieldErrors) setErrors(data.fieldErrors);
         setStatus("error");
-        setFeedback(data.error ?? "Something went wrong. Please try again.");
+        const ref = data.requestId && !data.fieldErrors ? ` (Ref: ${data.requestId.slice(0, 8)})` : "";
+        setFeedback((data.error ?? "Something went wrong. Please try again.") + ref);
       }
     } catch {
       setStatus("error");
